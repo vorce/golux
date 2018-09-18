@@ -35,7 +35,7 @@ defmodule Golux.MixProject do
       # If your app doesn't need them, they are safe to remove.
       {:scenic_sensor, "~> 0.7.0"},
       {:scenic_clock, ">= 0.0.0"},
-      {:golex, git: "https://github.com/vorce/golex.git", branch: "optimize_world_tick"}
+      {:golex, git: "https://github.com/vorce/golex.git", branch: "master"}
 
       # the https versions
       # { :scenic, git: "https://github.com/boydm/scenic.git", override: true },
