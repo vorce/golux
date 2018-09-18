@@ -47,16 +47,16 @@ defmodule Golux.Scene.GameOfLife do
 
   def build_grid(graph, {width, height}, spacing) do
     horizontal =
-      Enum.reduce(0..width, graph, fn x, acc ->
+      Enum.reduce(0..height, graph, fn y, acc ->
         acc
-        |> Scenic.Primitives.line({{0, spacing * x}, {width, spacing * x}},
+        |> Scenic.Primitives.line({{0, spacing * y}, {width, spacing * y}},
           stroke: {1, :white}
         )
       end)
 
-    Enum.reduce(0..height, horizontal, fn y, acc ->
+    Enum.reduce(0..width, horizontal, fn x, acc ->
       acc
-      |> Scenic.Primitives.line({{spacing * y, 0}, {spacing * y, height}},
+      |> Scenic.Primitives.line({{spacing * x, 0}, {spacing * x, height}},
         stroke: {1, :white}
       )
     end)
