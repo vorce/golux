@@ -10,37 +10,31 @@ defmodule Golux.Scene.GameOfLife do
   def init(_, _opts) do
     world = Golex.random_world(div(@width, @cell_size), div(@height, @cell_size))
 
+    render_game(world)
+
+    timer_interval = 500
+    {:ok, timer} = :timer.send_interval(timer_interval, :world_tick)
+
+    state = %{world: world, timer: timer, timer_interval: timer_interval}
+    {:ok, state}
+  end
+
+  def render_game(world) do
     Graph.build()
     |> world_graph(world)
     |> build_grid({@width, @height}, @cell_size)
     |> push_graph()
-
-    {:ok, timer} = :timer.send_interval(500, :world_tick)
-
-    state = %{world: world, timer: timer}
-    {:ok, state}
-  end
-
-  def filter_event(event, _, state) do
-    IO.inspect(binding(), label: "filter_event")
-
-    {:continue, event, state}
   end
 
   def handle_info(:world_tick, state) do
-    {took, ret} =
+    {_took, ret} =
       :timer.tc(fn ->
         new_world = Golex.world_tick(state.world)
-
-        Graph.build()
-        |> world_graph(new_world)
-        |> build_grid({@width, @height}, @cell_size)
-        |> push_graph()
-
+        render_game(new_world)
         new_world
       end)
 
-    IO.puts("World update + render: #{took / 1_000_000}s")
+    # IO.puts("World update + render: #{took / 1_000_000}s")
 
     {:noreply, %{state | world: ret}}
   end
@@ -83,6 +77,50 @@ defmodule Golux.Scene.GameOfLife do
 
       false ->
         graph
+    end
+  end
+
+  def handle_input({:cursor_button, {:left, :release, _, _}}, _input_context, state) do
+    IO.puts("Generating a new world")
+    new_world = Golex.random_world(div(@width, @cell_size), div(@height, @cell_size))
+    render_game(new_world)
+
+    {:noreply, %{state | world: new_world}}
+  end
+
+  def handle_input({:key, {"right", :release, _}}, _input_context, state) do
+    :timer.cancel(state.timer)
+    new_interval = interval(state.timer_interval, -100)
+    IO.puts("Setting update speed to: #{new_interval}")
+
+    {:ok, new_timer} = :timer.send_interval(new_interval, :world_tick)
+
+    {:noreply, %{state | timer: new_timer, timer_interval: new_interval}}
+  end
+
+  def handle_input({:key, {"left", :release, _}}, _input_context, state) do
+    :timer.cancel(state.timer)
+    new_interval = interval(state.timer_interval, 100)
+    IO.puts("Setting update speed to: #{new_interval}")
+
+    {:ok, new_timer} = :timer.send_interval(new_interval, :world_tick)
+
+    {:noreply, %{state | timer: new_timer, timer_interval: new_interval}}
+  end
+
+  def handle_input(_msg, _, state) do
+    # IO.inspect(msg, label: "handle_input")
+    {:noreply, state}
+  end
+
+  def interval(current, modifier, min \\ 100, max \\ 10_000) do
+    cond do
+      current + modifier >= max ->
+        max
+      current + modifier <= min ->
+        min
+      true ->
+        current + modifier
     end
   end
 end
