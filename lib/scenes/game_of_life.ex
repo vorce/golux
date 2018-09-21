@@ -34,7 +34,7 @@ defmodule Golux.Scene.GameOfLife do
         new_world
       end)
 
-    # IO.puts("World update + render: #{took / 1_000_000}s")
+    # IO.puts("#{took}")
 
     {:noreply, %{state | world: ret}}
   end
@@ -62,22 +62,12 @@ defmodule Golux.Scene.GameOfLife do
     end)
   end
 
-  def cell_graph(graph, %Golex.Cell{position: {x, y}, alive: living?}) do
-    case living? do
-      true ->
-        xp = x * @cell_size
-        yp = y * @cell_size
+  def cell_graph(graph, %Golex.Cell{alive: false}), do: graph
+  def cell_graph(graph, %Golex.Cell{position: {x, y}, alive: true}) do
+    xp = x * @cell_size
+    yp = y * @cell_size
 
-        graph
-        |> Scenic.Primitives.quad(
-          {{xp, yp}, {xp, yp + @cell_size}, {xp + @cell_size, yp + @cell_size}, {xp + @cell_size, yp}},
-          fill: :white,
-          id: "quad_#{x}_#{y}"
-        )
-
-      false ->
-        graph
-    end
+    Scenic.Primitives.rectangle(graph, {@cell_size, @cell_size}, fill: :white, translate: {xp, yp}, id: "rect_#{x}_#{y}")
   end
 
   def handle_input({:cursor_button, {:left, :release, _, _}}, _input_context, state) do
