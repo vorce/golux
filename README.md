@@ -20,3 +20,5 @@ The game of life "engine" is [golex](https://github.com/vorce/golex) and golux s
 
 - Repo contains a bunch of things from the default scenic skeleton. I plan on removing
 most of it.
+- Blog post about the making of this: [Game of Life in Elixir and Scenic](https://forvillelser.vorce.se/posts/2018-09-18-game-of-life-in-elixir-and-scenic.html)
+
