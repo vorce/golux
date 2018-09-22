@@ -12,7 +12,7 @@ defmodule Golux.Scene.GameOfLife do
 
     render_game(world)
 
-    timer_interval = 500
+    timer_interval = 400
     {:ok, timer} = :timer.send_interval(timer_interval, :world_tick)
 
     state = %{world: world, timer: timer, timer_interval: timer_interval}
@@ -63,6 +63,7 @@ defmodule Golux.Scene.GameOfLife do
   end
 
   def cell_graph(graph, %Golex.Cell{alive: false}), do: graph
+
   def cell_graph(graph, %Golex.Cell{position: {x, y}, alive: true}) do
     xp = x * @cell_size
     yp = y * @cell_size
@@ -107,8 +108,10 @@ defmodule Golux.Scene.GameOfLife do
     cond do
       current + modifier >= max ->
         max
+
       current + modifier <= min ->
         min
+
       true ->
         current + modifier
     end
