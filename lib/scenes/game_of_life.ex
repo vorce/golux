@@ -105,15 +105,8 @@ defmodule Golux.Scene.GameOfLife do
   end
 
   def interval(current, modifier, min \\ 100, max \\ 10_000) do
-    cond do
-      current + modifier >= max ->
-        max
-
-      current + modifier <= min ->
-        min
-
-      true ->
-        current + modifier
-    end
+    (current + modifier)
+    |> min(max)
+    |> max(min)
   end
 end
